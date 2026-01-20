@@ -2,38 +2,26 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<title>Tìm kiếm thông tin</title>
+<title>Tra cứu thông tin</title>
 
 <style>
 body {
     font-family: Arial;
-    background: #e9edf2;
-}
-
-.window {
-    width: 720px;
-    margin: 40px auto;
-    background: #fff;
-    border: 1px solid #aaa;
-}
-
-.title {
-    background: #0d6efd;
-    color: white;
-    padding: 8px 12px;
-    font-weight: bold;
+    width: 650px;
+    margin: 20px auto;
 }
 
 .tabs {
     display: flex;
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1px solid #aaa;
 }
 
 .tab {
-    padding: 8px 15px;
-    border-right: 1px solid #ccc;
+    padding: 8px 18px;
+    border: 1px solid #aaa;
+    border-bottom: none;
+    background: #eee;
     cursor: pointer;
-    background: #f5f5f5;
 }
 
 .tab.active {
@@ -42,152 +30,40 @@ body {
 }
 
 .content {
+    border: 1px solid #aaa;
     padding: 15px;
 }
 
 input {
-    width: 400px;
-    padding: 6px;
-    font-size: 14px;
-}
-
-table {
     width: 100%;
-    border-collapse: collapse;
-    margin-top: 12px;
+    padding: 7px;
+    font-size: 16px;
 }
 
-th {
-    background: #e3e7ed;
-    padding: 6px;
-    border: 1px solid #ccc;
-}
-
-td {
-    padding: 6px;
-    border: 1px solid #ddd;
-    font-size: 13px;
+ul {
+    margin-top: 10px;
+    max-height: 350px;
+    overflow-y: auto;
 }
 </style>
 </head>
 
 <body>
 
-<div class="window">
-    <div class="title">Tìm kiếm thông tin</div>
+<h3>Tìm kiếm thông tin</h3>
 
-    <div class="tabs">
-        <div class="tab active" onclick="setTab('bank')">Tìm ngân hàng</div>
-        <div class="tab" onclick="setTab('xa')">Tìm mã phường/xã</div>
-        <div class="tab" onclick="setTab('kho')">Tìm Kho bạc</div>
-    </div>
-
-    <div class="content">
-        Từ khóa:
-        <input id="keyword" placeholder="Nhập mã hoặc tên...">
-        <span id="count"></span>
-
-        <table>
-            <thead>
-                <tr>
-                    <th>Mã</th>
-                    <th>Tên</th>
-                    <th>Ghi chú</th>
-                </tr>
-            </thead>
-            <tbody id="result"></tbody>
-        </table>
-    </div>
+<div class="tabs">
+    <div class="tab active" onclick="openTab('nganhang')">Ngân hàng</div>
+    <div class="tab" onclick="openTab('kbnn')">Kho bạc</div>
+    <div class="tab" onclick="openTab('dbhc')">Phường / Xã</div>
 </div>
 
-<script>
-let currentTab = "bank";
-let allData = {
-    bank: [],
-    xa: [],
-    kho: []
-};
+<div class="content">
+    <input id="keyword" placeholder="Nhập từ khóa...">
+    <ul id="result"></ul>
+</div>
 
-const files = {
-    bank: "dm1.txt",
-    xa: "dm2.txt",
-    kho: "dm3.txt"
-};
-
-// load toàn bộ dữ liệu 1 lần
-async function loadData() {
-    for (let key in files) {
-        const res = await fetch(files[key]);
-        const text = await res.text();
-
-        allData[key] = text.split("\n")
-            .map(l => l.trim())
-            .filter(l => l !== "")
-            .map(l => {
-                const c = l.split(/\t+/);
-                return {
-                    ma: c[0] || "",
-                    ten: c[1] || "",
-                    note: c[2] || ""
-                };
-            });
-    }
-}
-
-function setTab(tab) {
-    currentTab = tab;
-
-    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-    event.target.classList.add("active");
-
-    document.getElementById("result").innerHTML = "";
-}
-
-let timer = null;
-
-document.getElementById("keyword").addEventListener("input", () => {
-    clearTimeout(timer);
-    timer = setTimeout(search, 300);
-});
-
-function search() {
-    const key = document.getElementById("keyword").value.toLowerCase();
-    const tbody = document.getElementById("result");
-    tbody.innerHTML = "";
-
-    if (key === "") return;
-
-    const data = allData[currentTab];
-    let count = 0;
-
-    const frag = document.createDocumentFragment();
-
-    for (let row of data) {
-        if (
-            row.ma.toLowerCase().includes(key) ||
-            row.ten.toLowerCase().includes(key) ||
-            row.note.toLowerCase().includes(key)
-        ) {
-            const tr = document.createElement("tr");
-            tr.innerHTML = `
-                <td>${row.ma}</td>
-                <td>${row.ten}</td>
-                <td>${row.note}</td>
-            `;
-            frag.appendChild(tr);
-
-            count++;
-            if (count >= 200) break; // chống lag
-        }
-    }
-
-    tbody.appendChild(frag);
-    document.getElementById("count").innerText =
-        ` (hiển thị ${count} dòng)`;
-}
-
-loadData();
-</script>
+<script src="script.js"></script>
 
 </body>
 </html>
