@@ -2,128 +2,191 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<title>Tra cứu danh mục</title>
+<title>Tìm kiếm thông tin</title>
 
 <style>
 body {
     font-family: Arial;
-    background: #f4f6f8;
-    padding: 30px;
+    background: #e9edf2;
 }
 
-.container {
-    max-width: 900px;
-    margin: auto;
+.window {
+    width: 720px;
+    margin: 40px auto;
+    background: #fff;
+    border: 1px solid #aaa;
+}
+
+.title {
+    background: #0d6efd;
+    color: white;
+    padding: 8px 12px;
+    font-weight: bold;
+}
+
+.tabs {
+    display: flex;
+    border-bottom: 1px solid #ccc;
+}
+
+.tab {
+    padding: 8px 15px;
+    border-right: 1px solid #ccc;
+    cursor: pointer;
+    background: #f5f5f5;
+}
+
+.tab.active {
     background: white;
-    padding: 25px;
-    border-radius: 12px;
+    font-weight: bold;
+}
+
+.content {
+    padding: 15px;
 }
 
 input {
-    width: 100%;
-    padding: 14px;
-    font-size: 18px;
-    margin-bottom: 20px;
+    width: 400px;
+    padding: 6px;
+    font-size: 14px;
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
+    margin-top: 12px;
 }
 
 th {
-    background: #0d6efd;
-    color: white;
-    padding: 10px;
+    background: #e3e7ed;
+    padding: 6px;
+    border: 1px solid #ccc;
 }
 
 td {
-    padding: 8px;
-    border-bottom: 1px solid #ddd;
+    padding: 6px;
+    border: 1px solid #ddd;
+    font-size: 13px;
 }
 </style>
 </head>
 
 <body>
 
-<div class="container">
-    <h2>🔍 Tra cứu danh mục</h2>
+<div class="window">
+    <div class="title">Tìm kiếm thông tin</div>
 
-    <input
-        id="search"
-        type="text"
-        placeholder="Nhập mã / tên / tỉnh..."
-        onkeyup="searchData()"
-    >
+    <div class="tabs">
+        <div class="tab active" onclick="setTab('bank')">Tìm ngân hàng</div>
+        <div class="tab" onclick="setTab('xa')">Tìm mã phường/xã</div>
+        <div class="tab" onclick="setTab('kho')">Tìm Kho bạc</div>
+    </div>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Mã</th>
-                <th>Tên</th>
-                <th>Tỉnh / Thành phố</th>
-            </tr>
-        </thead>
-        <tbody id="result"></tbody>
-    </table>
+    <div class="content">
+        Từ khóa:
+        <input id="keyword" placeholder="Nhập mã hoặc tên...">
+        <span id="count"></span>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Mã</th>
+                    <th>Tên</th>
+                    <th>Ghi chú</th>
+                </tr>
+            </thead>
+            <tbody id="result"></tbody>
+        </table>
+    </div>
 </div>
 
 <script>
-let data = [];
+let currentTab = "bank";
+let allData = {
+    bank: [],
+    xa: [],
+    kho: []
+};
 
-// ⚠️ ĐƯỜNG DẪN PHẢI ĐÚNG TUYỆT ĐỐI
-const files = ["dm1.txt", "dm2.txt", "dm3.txt"];
+const files = {
+    bank: "dm1.txt",
+    xa: "dm2.txt",
+    kho: "dm3.txt"
+};
 
-async function loadFiles() {
-    for (let f of files) {
-        try {
-            const res = await fetch(f);
-            const text = await res.text();
+// load toàn bộ dữ liệu 1 lần
+async function loadData() {
+    for (let key in files) {
+        const res = await fetch(files[key]);
+        const text = await res.text();
 
-            text.split("\n").forEach(line => {
-                line = line.trim();
-                if (!line) return;
-
-                const c = line.split(/\t+/);
-                if (c.length >= 3) {
-                    data.push({
-                        ma: c[0],
-                        ten: c[1],
-                        tinh: c[2]
-                    });
-                }
+        allData[key] = text.split("\n")
+            .map(l => l.trim())
+            .filter(l => l !== "")
+            .map(l => {
+                const c = l.split(/\t+/);
+                return {
+                    ma: c[0] || "",
+                    ten: c[1] || "",
+                    note: c[2] || ""
+                };
             });
-        } catch (e) {
-            console.log("Không load được:", f);
-        }
     }
 }
 
-function searchData() {
-    const key = document.getElementById("search").value.toLowerCase();
-    const out = document.getElementById("result");
-    out.innerHTML = "";
+function setTab(tab) {
+    currentTab = tab;
+
+    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+    event.target.classList.add("active");
+
+    document.getElementById("result").innerHTML = "";
+}
+
+let timer = null;
+
+document.getElementById("keyword").addEventListener("input", () => {
+    clearTimeout(timer);
+    timer = setTimeout(search, 300);
+});
+
+function search() {
+    const key = document.getElementById("keyword").value.toLowerCase();
+    const tbody = document.getElementById("result");
+    tbody.innerHTML = "";
 
     if (key === "") return;
 
-    data.forEach(r => {
+    const data = allData[currentTab];
+    let count = 0;
+
+    const frag = document.createDocumentFragment();
+
+    for (let row of data) {
         if (
-            r.ma.toLowerCase().includes(key) ||
-            r.ten.toLowerCase().includes(key) ||
-            r.tinh.toLowerCase().includes(key)
+            row.ma.toLowerCase().includes(key) ||
+            row.ten.toLowerCase().includes(key) ||
+            row.note.toLowerCase().includes(key)
         ) {
-            out.innerHTML += `
-                <tr>
-                    <td>${r.ma}</td>
-                    <td>${r.ten}</td>
-                    <td>${r.tinh}</td>
-                </tr>
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td>${row.ma}</td>
+                <td>${row.ten}</td>
+                <td>${row.note}</td>
             `;
+            frag.appendChild(tr);
+
+            count++;
+            if (count >= 200) break; // chống lag
         }
-    });
+    }
+
+    tbody.appendChild(frag);
+    document.getElementById("count").innerText =
+        ` (hiển thị ${count} dòng)`;
 }
 
-loadFiles();
+loadData();
 </script>
 
 </body>
