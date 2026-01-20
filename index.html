@@ -2,13 +2,13 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<title>Tra cứu danh mục hành chính</title>
+<title>Tra cứu danh mục</title>
 
 <style>
 body {
     font-family: Arial;
-    background: #f2f4f7;
-    padding: 40px;
+    background: #f4f6f8;
+    padding: 30px;
 }
 
 .container {
@@ -41,22 +41,18 @@ td {
     padding: 8px;
     border-bottom: 1px solid #ddd;
 }
-
-tr:hover {
-    background: #f1f1f1;
-}
 </style>
 </head>
 
 <body>
 
 <div class="container">
-    <h2>🔍 Tra cứu danh mục (TXT)</h2>
+    <h2>🔍 Tra cứu danh mục</h2>
 
     <input
         id="search"
         type="text"
-        placeholder="Nhập mã / phường / quận / tỉnh..."
+        placeholder="Nhập mã / tên / tỉnh..."
         onkeyup="searchData()"
     >
 
@@ -73,65 +69,62 @@ tr:hover {
 </div>
 
 <script>
-let allRows = [];
+let data = [];
 
-async function loadTXT(file) {
-    const res = await fetch(file);
-    const text = await res.text();
+// ⚠️ ĐƯỜNG DẪN PHẢI ĐÚNG TUYỆT ĐỐI
+const files = ["dm1.txt", "dm2.txt", "dm3.txt"];
 
-    return text
-        .split('\n')
-        .map(line => line.trim())
-        .filter(line => line !== "");
-}
+async function loadFiles() {
+    for (let f of files) {
+        try {
+            const res = await fetch(f);
+            const text = await res.text();
 
-async function loadAll() {
-    const f1 = await loadTXT("dm1.txt");
-    const f2 = await loadTXT("dm2.txt");
-    const f3 = await loadTXT("dm3.txt");
+            text.split("\n").forEach(line => {
+                line = line.trim();
+                if (!line) return;
 
-    const data = [...f1, ...f2, ...f3];
-
-    data.forEach(line => {
-        const cols = line.split(/\t+/); // TAB
-        if (cols.length >= 3) {
-            allRows.push({
-                ma: cols[0],
-                ten: cols[1],
-                tinh: cols[2]
+                const c = line.split(/\t+/);
+                if (c.length >= 3) {
+                    data.push({
+                        ma: c[0],
+                        ten: c[1],
+                        tinh: c[2]
+                    });
+                }
             });
+        } catch (e) {
+            console.log("Không load được:", f);
         }
-    });
+    }
 }
 
 function searchData() {
     const key = document.getElementById("search").value.toLowerCase();
-    const tbody = document.getElementById("result");
-
-    tbody.innerHTML = "";
+    const out = document.getElementById("result");
+    out.innerHTML = "";
 
     if (key === "") return;
 
-    allRows.forEach(row => {
+    data.forEach(r => {
         if (
-            row.ma.toLowerCase().includes(key) ||
-            row.ten.toLowerCase().includes(key) ||
-            row.tinh.toLowerCase().includes(key)
+            r.ma.toLowerCase().includes(key) ||
+            r.ten.toLowerCase().includes(key) ||
+            r.tinh.toLowerCase().includes(key)
         ) {
-            tbody.innerHTML += `
+            out.innerHTML += `
                 <tr>
-                    <td>${row.ma}</td>
-                    <td>${row.ten}</td>
-                    <td>${row.tinh}</td>
+                    <td>${r.ma}</td>
+                    <td>${r.ten}</td>
+                    <td>${r.tinh}</td>
                 </tr>
             `;
         }
     });
 }
 
-loadAll();
+loadFiles();
 </script>
 
 </body>
 </html>
-
