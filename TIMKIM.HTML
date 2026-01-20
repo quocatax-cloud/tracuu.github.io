@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Tra cứu danh mục hành chính</title>
+
+<style>
+body {
+    font-family: Arial;
+    background: #f2f4f7;
+    padding: 40px;
+}
+
+.container {
+    max-width: 900px;
+    margin: auto;
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+}
+
+input {
+    width: 100%;
+    padding: 14px;
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    background: #0d6efd;
+    color: white;
+    padding: 10px;
+}
+
+td {
+    padding: 8px;
+    border-bottom: 1px solid #ddd;
+}
+
+tr:hover {
+    background: #f1f1f1;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h2>🔍 Tra cứu danh mục (TXT)</h2>
+
+    <input
+        id="search"
+        type="text"
+        placeholder="Nhập mã / phường / quận / tỉnh..."
+        onkeyup="searchData()"
+    >
+
+    <table>
+        <thead>
+            <tr>
+                <th>Mã</th>
+                <th>Tên</th>
+                <th>Tỉnh / Thành phố</th>
+            </tr>
+        </thead>
+        <tbody id="result"></tbody>
+    </table>
+</div>
+
+<script>
+let allRows = [];
+
+async function loadTXT(file) {
+    const res = await fetch(file);
+    const text = await res.text();
+
+    return text
+        .split('\n')
+        .map(line => line.trim())
+        .filter(line => line !== "");
+}
+
+async function loadAll() {
+    const f1 = await loadTXT("dm1.txt");
+    const f2 = await loadTXT("dm2.txt");
+    const f3 = await loadTXT("dm3.txt");
+
+    const data = [...f1, ...f2, ...f3];
+
+    data.forEach(line => {
+        const cols = line.split(/\t+/); // TAB
+        if (cols.length >= 3) {
+            allRows.push({
+                ma: cols[0],
+                ten: cols[1],
+                tinh: cols[2]
+            });
+        }
+    });
+}
+
+function searchData() {
+    const key = document.getElementById("search").value.toLowerCase();
+    const tbody = document.getElementById("result");
+
+    tbody.innerHTML = "";
+
+    if (key === "") return;
+
+    allRows.forEach(row => {
+        if (
+            row.ma.toLowerCase().includes(key) ||
+            row.ten.toLowerCase().includes(key) ||
+            row.tinh.toLowerCase().includes(key)
+        ) {
+            tbody.innerHTML += `
+                <tr>
+                    <td>${row.ma}</td>
+                    <td>${row.ten}</td>
+                    <td>${row.tinh}</td>
+                </tr>
+            `;
+        }
+    });
+}
+
+loadAll();
+</script>
+
+</body>
+</html>
