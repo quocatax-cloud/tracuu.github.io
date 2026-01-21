@@ -75,33 +75,50 @@ function searchDBHC(keyword) {
 
         let score = 0;
 
-        // khớp tuyệt đối
-        if (full === q) score += 300;
+        /* ==========================
+           1. ĐÚNG Y TUYỆT ĐỐI
+        ========================== */
+        if (nTen === q) score += 1000;
 
-        // cụm đầy đủ
-        if (full.includes(q)) score += 150;
+        /* ==========================
+           2. ĐÚNG CỤM
+        ========================== */
+        if (nTen.includes(q)) score += 800;
 
-        // tên xã/phường cực ưu tiên
-        if (nTen.includes(q)) score += 120;
+        /* ==========================
+           3. KHỚP ĐỦ TỪ ĐÚNG THỨ TỰ
+        ========================== */
+        if (full.includes(q)) score += 600;
 
-        // tỉnh/huyện
-        if (nTinh.includes(q)) score += 80;
+        /* ==========================
+           4. ĐẢO TỪ (PHỤ)
+        ========================== */
+        const tenWords = nTen.split(" ");
+        if (keys.length === tenWords.length) {
+            const a = [...keys].sort().join(" ");
+            const b = [...tenWords].sort().join(" ");
+            if (a === b) score += 300;
+        }
 
-        // từng từ
+        /* ==========================
+           5. TỪ RỜI
+        ========================== */
         keys.forEach(k => {
-            if (nTen.includes(k)) score += 25;
-            if (nTinh.includes(k)) score += 15;
+            if (nTen.includes(k)) score += 80;
+            if (nTinh.includes(k)) score += 40;
         });
 
-        // mã
-        if (ma.includes(keyword)) score += 200;
+        /* ==========================
+           6. MÃ
+        ========================== */
+        if (ma.includes(keyword)) score += 900;
 
         if (score > 0)
             results.push({ line, score });
     }
 
     results.sort((a, b) => b.score - a.score);
-    return results.slice(0, 40);
+    return results.slice(0, 30);
 }
 
 /* =====================
