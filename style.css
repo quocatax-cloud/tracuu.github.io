@@ -134,3 +134,17 @@ input:focus {
         max-height: 60vh;
     }
 }
+
+#results {
+    max-height: 360px !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    display: block;
+}
+
+.result-item {
+    white-space: normal !important;
+    word-break: break-word !important;
+    overflow-wrap: anywhere !important;
+}
+
