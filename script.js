@@ -4,67 +4,96 @@ const files = {
     nganhang: "data/nganhang.txt"
 };
 
-let currentType = "dbhc";
+let current = "dbhc";
 let data = [];
 
-document.querySelectorAll(".tab").forEach(tab => {
-    tab.onclick = () => {
-        document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-        tab.classList.add("active");
-        currentType = tab.dataset.type;
-        document.getElementById("searchInput").value = "";
-        document.getElementById("result").innerHTML = "";
-        loadData();
-    };
-});
+const input = document.getElementById("search");
+const result = document.getElementById("result");
 
+/* ======================
+   LOAD FILE TXT
+====================== */
 async function loadData() {
-    const res = await fetch(files[currentType]);
+    const res = await fetch(files[current]);
     const text = await res.text();
 
     data = text
         .split("\n")
-        .map(line => line.trim())
-        .filter(line => line !== "");
+        .map(x => x.trim())
+        .filter(Boolean);
 }
 
+loadData();
+
+/* ======================
+   TAB CLICK
+====================== */
+document.querySelectorAll(".tab").forEach(tab => {
+    tab.onclick = () => {
+        document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+        tab.classList.add("active");
+
+        current = tab.dataset.type;
+        input.value = "";
+        result.innerHTML = "";
+
+        loadData();
+    };
+});
+
+/* ======================
+   CHUẨN HOÁ CHUỖI
+====================== */
 function normalize(text) {
     return text
         .toLowerCase()
         .normalize("NFD")
         .replace(/[\u0300-\u036f]/g, "")
         .replace(/đ/g, "d")
-        .replace(/[^a-z0-9 ]/g, " ");
+        .replace(/[^a-z0-9 ]/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
 }
 
-document.getElementById("searchInput").addEventListener("input", function () {
-    const keyword = normalize(this.value);
-    const keys = keyword.split(/\s+/).filter(k => k);
+/* ======================
+   SEARCH ENGINE
+====================== */
+input.addEventListener("input", () => {
 
-    let html = "";
-
-    if (keys.length === 0) {
-        document.getElementById("result").innerHTML = "";
+    const key = normalize(input.value);
+    if (!key) {
+        result.innerHTML = "";
         return;
     }
 
-    let count = 0;
+    const words = key.split(" ");
+    const matches = [];
 
     for (let line of data) {
         const text = normalize(line);
+        let score = 0;
 
-        const match = keys.every(k => text.includes(k));
+        // khớp cả cụm
+        if (text.includes(key)) score += 100;
 
-        if (match) {
-            count++;
-            html += `<div class="result-item">${line}</div>`;
+        // khớp từng từ
+        words.forEach(w => {
+            if (text.includes(w)) score += 20;
+        });
+
+        if (score > 0) {
+            matches.push({ line, score });
         }
-
-        if (count >= 50) break; // chống lag
     }
 
-    document.getElementById("result").innerHTML =
-        html || "<div class='result-item'>❌ Không tìm thấy kết quả</div>";
-});
+    matches.sort((a, b) => b.score - a.score);
 
-loadData();
+    const top = matches.slice(0, 20);
+
+    result.innerHTML =
+        top.length === 0
+            ? "<div class='result-item'>❌ Không tìm thấy kết quả</div>"
+            : top.map(x =>
+                `<div class="result-item">${x.line}</div>`
+              ).join("");
+});
