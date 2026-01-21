@@ -1,99 +1,47 @@
-const files = {
-    dbhc: "data/dbhc.txt",
-    kbnn: "data/kbnn.txt",
-    nganhang: "data/nganhang.txt"
-};
+const data = [
+    { ma: "1051234", ten: "UBND xã Hòa Vang", cap: "Xã" },
+    { ma: "1051235", ten: "UBND phường Hòa Khánh", cap: "Phường" },
+    { ma: "1051236", ten: "UBND phường Hải Châu", cap: "Phường" },
+    { ma: "1051237", ten: "Kho bạc Nhà nước Hòa Vang", cap: "Kho bạc" },
+    { ma: "1051238", ten: "Kho bạc Nhà nước khu vực XIII", cap: "Kho bạc" },
+];
 
-let current = "dbhc";
-let data = [];
-
-const input = document.getElementById("search");
-const result = document.getElementById("result");
-
-/* ======================
-   LOAD FILE TXT
-====================== */
-async function loadData() {
-    const res = await fetch(files[current]);
-    const text = await res.text();
-
-    data = text
-        .split("\n")
-        .map(x => x.trim())
-        .filter(Boolean);
+// test cho nhiều dòng → kiểm tra scroll
+for (let i = 0; i < 50; i++) {
+    data.push({
+        ma: "10" + i,
+        ten: "Đơn vị test số " + i,
+        cap: "Test"
+    });
 }
 
-loadData();
+function search() {
+    const keyword = document.getElementById("keyword").value.toLowerCase();
+    const result = document.getElementById("result");
 
-/* ======================
-   TAB CLICK
-====================== */
-document.querySelectorAll(".tab").forEach(tab => {
-    tab.onclick = () => {
-        document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-        tab.classList.add("active");
+    result.innerHTML = "";
 
-        current = tab.dataset.type;
-        input.value = "";
-        result.innerHTML = "";
+    const filtered = data.filter(item =>
+        item.ma.includes(keyword) ||
+        item.ten.toLowerCase().includes(keyword)
+    );
 
-        loadData();
-    };
-});
-
-/* ======================
-   CHUẨN HOÁ CHUỖI
-====================== */
-function normalize(text) {
-    return text
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .replace(/đ/g, "d")
-        .replace(/[^a-z0-9 ]/g, " ")
-        .replace(/\s+/g, " ")
-        .trim();
-}
-
-/* ======================
-   SEARCH ENGINE
-====================== */
-input.addEventListener("input", () => {
-
-    const key = normalize(input.value);
-    if (!key) {
-        result.innerHTML = "";
+    if (filtered.length === 0) {
+        result.innerHTML = `
+            <tr>
+                <td colspan="3">Không tìm thấy kết quả</td>
+            </tr>
+        `;
         return;
     }
 
-    const words = key.split(" ");
-    const matches = [];
-
-    for (let line of data) {
-        const text = normalize(line);
-        let score = 0;
-
-        // khớp cả cụm
-        if (text.includes(key)) score += 100;
-
-        // khớp từng từ
-        words.forEach(w => {
-            if (text.includes(w)) score += 20;
-        });
-
-        if (score > 0) {
-            matches.push({ line, score });
-        }
-    }
-
-    matches.sort((a, b) => b.score - a.score);
-
-    const top = matches.slice(0, 20);
-
-    result.innerHTML =
-        top.length === 0
-            ? "<div class='result-item'>❌ Không tìm thấy kết quả</div>"
-            : top.map(x =>
-                `<div class="result-item">${x.line}</div>`
-              ).join("");
-});
+    filtered.forEach(item => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td>${item.ma}</td>
+            <td>${item.ten}</td>
+            <td>${item.cap}</td>
+        `;
+        result.appendChild(tr);
+    });
+}
