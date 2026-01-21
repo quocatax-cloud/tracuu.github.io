@@ -1,38 +1,38 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <title>Tra cứu đơn vị</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<title>Tra cứu danh mục</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div class="container">
-    <h2>TRA CỨU ĐƠN VỊ</h2>
 
-    <input 
-        type="text" 
-        id="keyword" 
-        placeholder="Nhập tên đơn vị hoặc mã..."
+    <h2>TRA CỨU DANH MỤC</h2>
+
+    <div class="tabs">
+        <button class="tab active" data-file="dbhc.txt">Phường / Xã</button>
+        <button class="tab" data-file="kbnn.txt">Kho bạc</button>
+        <button class="tab" data-file="nganhang.txt">Ngân hàng</button>
+    </div>
+
+    <input
+        id="searchInput"
+        placeholder="Nhập tên, mã, khu vực, số..."
+        autocomplete="off"
     >
-
-    <button onclick="search()">Tìm kiếm</button>
 
     <!-- KHUNG GIỮ CỐ ĐỊNH -->
     <div class="table-wrapper">
         <table>
             <thead>
-                <tr>
-                    <th>Mã</th>
-                    <th>Tên đơn vị</th>
-                    <th>Cấp</th>
-                </tr>
+                <tr id="table-head"></tr>
             </thead>
-            <tbody id="result">
-                <!-- JS đổ dữ liệu -->
-            </tbody>
+            <tbody id="results"></tbody>
         </table>
     </div>
+
 </div>
 
 <script src="script.js"></script>
