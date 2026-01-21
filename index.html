@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Tìm kiếm thông tin</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="window">
+
+    <div class="titlebar">Tìm kiếm thông tin</div>
+
+    <div class="tabs">
+        <button class="tab active" onclick="openTab('nganhang')">Ngân hàng</button>
+        <button class="tab" onclick="openTab('kbnn')">Kho bạc</button>
+        <button class="tab" onclick="openTab('dbhc')">Phường / Xã</button>
+    </div>
+
+    <div class="search">
+        <label>Từ khóa:</label>
+        <input id="keyword" placeholder="Nhập mã hoặc tên...">
+    </div>
+
+    <table>
+        <thead id="thead"></thead>
+        <tbody id="result"></tbody>
+    </table>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
