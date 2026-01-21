@@ -118,7 +118,7 @@ function searchDBHC(keyword) {
     }
 
     results.sort((a, b) => b.score - a.score);
-    return results.slice(0, 30);
+    return results;
 }
 
 /* =====================
