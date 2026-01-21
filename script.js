@@ -1,18 +1,18 @@
 let rawData = [];
 let currentFile = "dbhc.txt";
 let lastResult = [];
- 
+
 const input = document.getElementById("searchInput");
 const tbody = document.getElementById("results");
 const thead = document.getElementById("table-head");
 const tabs = document.querySelectorAll(".tab");
 
 /* =====================
-   CHUẨN HÓA
+   CHUẨN HÓA TIẾNG VIỆT
 ===================== */
-
-function normalize(s) {
-    return s.toLowerCase()
+function normalize(str) {
+    return str
+        .toLowerCase()
         .normalize("NFD")
         .replace(/[\u0300-\u036f]/g, "")
         .replace(/đ/g, "d")
@@ -22,78 +22,153 @@ function normalize(s) {
 }
 
 /* =====================
-   LOAD TXT
+   LOAD FILE TXT
 ===================== */
-
 async function loadFile(file) {
-    tbody.innerHTML = "";
     input.value = "";
+    tbody.innerHTML = "";
+    rawData = [];
 
     const res = await fetch("data/" + file);
     const text = await res.text();
 
-    rawData = text.split(/\r?\n/).filter(l => l.trim());
+    rawData = text.split(/\r?\n/).filter(x => x.trim());
+
     buildHeader(file);
 }
 
 loadFile(currentFile);
 
 /* =====================
-   HEADER
+   HEADER TABLE
 ===================== */
-
 function buildHeader(file) {
     if (file === "dbhc.txt")
-        thead.innerHTML = "<th>Mã</th><th>Xã / Phường</th><th>Tỉnh</th>";
+        thead.innerHTML = "<th>Mã</th><th>Phường / Xã</th><th>Tỉnh / Huyện</th>";
     else if (file === "kbnn.txt")
-        thead.innerHTML = "<th>Tên KBNN</th><th>Mã</th><th>Tỉnh</th>";
+        thead.innerHTML = "<th>Tên Kho bạc</th><th>Mã</th><th>Tỉnh</th>";
     else
         thead.innerHTML = "<th>Mã</th><th>Ngân hàng</th>";
 }
 
 /* =====================
-   SEARCH
+   SEARCH DBHC (ƯU TIÊN CAO)
 ===================== */
+function searchDBHC(keyword) {
 
-input.addEventListener("input", () => {
-    const q = normalize(input.value);
-    tbody.innerHTML = "";
-    lastResult = [];
-
-    if (!q) return;
-
+    const q = normalize(keyword);
     const keys = q.split(" ");
 
-    let scored = [];
+    let results = [];
 
     for (let line of rawData) {
+
+        const cols = line.split(/\t| {2,}/);
+
+        const ma = cols[0] || "";
+        const ten = cols[1] || "";
+        const tinh = cols[2] || "";
+
+        const nTen = normalize(ten);
+        const nTinh = normalize(tinh);
+        const full = normalize(ten + " " + tinh);
+
+        let score = 0;
+
+        // khớp tuyệt đối
+        if (full === q) score += 300;
+
+        // cụm đầy đủ
+        if (full.includes(q)) score += 150;
+
+        // tên xã/phường cực ưu tiên
+        if (nTen.includes(q)) score += 120;
+
+        // tỉnh/huyện
+        if (nTinh.includes(q)) score += 80;
+
+        // từng từ
+        keys.forEach(k => {
+            if (nTen.includes(k)) score += 25;
+            if (nTinh.includes(k)) score += 15;
+        });
+
+        // mã
+        if (ma.includes(keyword)) score += 200;
+
+        if (score > 0)
+            results.push({ line, score });
+    }
+
+    results.sort((a, b) => b.score - a.score);
+    return results.slice(0, 40);
+}
+
+/* =====================
+   SEARCH KHÁC
+===================== */
+function searchNormal(keyword) {
+
+    const q = normalize(keyword);
+    const keys = q.split(" ");
+
+    let results = [];
+
+    for (let line of rawData) {
+
         const n = normalize(line);
         let score = 0;
 
+        if (n.includes(q)) score += 80;
+
         keys.forEach(k => {
-            if (n.includes(k)) score += 2;
+            if (n.includes(k)) score += 20;
         });
 
-        if (n.startsWith(q)) score += 5;
         if (score > 0)
-            scored.push({ line, score });
+            results.push({ line, score });
     }
 
-    scored.sort((a, b) => b.score - a.score);
-    scored = scored.slice(0, 50);
+    results.sort((a, b) => b.score - a.score);
+    return results.slice(0, 50);
+}
 
-    lastResult = scored;
+/* =====================
+   INPUT SEARCH
+===================== */
+input.addEventListener("input", () => {
 
-    scored.forEach(obj => {
-        const cols = obj.line.split(/\s{2,}|\t/);
+    tbody.innerHTML = "";
+    lastResult = [];
 
+    const keyword = input.value.trim();
+    if (!keyword) return;
+
+    let results = [];
+
+    if (currentFile === "dbhc.txt")
+        results = searchDBHC(keyword);
+    else
+        results = searchNormal(keyword);
+
+    lastResult = results;
+
+    const keys = normalize(keyword).split(" ");
+
+    results.forEach(obj => {
+
+        const cols = obj.line.split(/\t| {2,}/);
         const tr = document.createElement("tr");
 
-        cols.forEach(c => {
-            let html = c;
+        cols.forEach(col => {
+
+            let html = col;
+
             keys.forEach(k => {
-                const reg = new RegExp(`(${k})`, "gi");
-                html = html.replace(reg, "<mark>$1</mark>");
+                if (k.length > 1) {
+                    const reg = new RegExp(`(${k})`, "gi");
+                    html = html.replace(reg, "<mark>$1</mark>");
+                }
             });
 
             const td = document.createElement("td");
@@ -111,14 +186,13 @@ input.addEventListener("input", () => {
 });
 
 /* =====================
-   TAB
+   TAB SWITCH
 ===================== */
-
-tabs.forEach(t => {
-    t.onclick = () => {
-        tabs.forEach(x => x.classList.remove("active"));
-        t.classList.add("active");
-        currentFile = t.dataset.file;
+tabs.forEach(tab => {
+    tab.onclick = () => {
+        tabs.forEach(t => t.classList.remove("active"));
+        tab.classList.add("active");
+        currentFile = tab.dataset.file;
         loadFile(currentFile);
     };
 });
