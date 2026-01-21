@@ -3,148 +3,101 @@
     font-family: "Segoe UI", Arial, sans-serif;
 }
 
-body {
+html, body {
+    height: 100%;
     margin: 0;
+}
+
+/* khóa body */
+body {
     background: #f4f6f9;
-    height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
+    overflow: hidden;   /* 🔥 QUAN TRỌNG */
 }
 
-/* ===== KHUNG CHÍNH ===== */
-
+/* khung chính */
 .container {
-    width: 720px;
-    max-width: 95%;
-    background: #ffffff;
+    width: 760px;
+    max-width: 96%;
+    height: 90vh;        /* 🔥 KHÓA CHIỀU CAO */
+    background: #fff;
     border-radius: 14px;
-    padding: 24px 26px 22px;
-    box-shadow: 0 10px 30px rgba(0,0,0,.12);
+    padding: 22px;
+    box-shadow: 0 12px 30px rgba(0,0,0,.15);
+
+    display: flex;
+    flex-direction: column;
 }
 
-/* ===== TIÊU ĐỀ ===== */
-
+/* tiêu đề */
 h2 {
-    margin: 0 0 16px;
+    margin: 0 0 14px;
     text-align: center;
     color: #0b3d91;
-    font-weight: 600;
-    letter-spacing: .5px;
 }
 
-/* ===== TAB ===== */
-
+/* tab */
 .tabs {
     display: flex;
-    margin-bottom: 14px;
-    border-bottom: 2px solid #e6e6e6;
+    border-bottom: 2px solid #e5e5e5;
 }
 
 .tab {
     padding: 10px 22px;
     cursor: pointer;
     font-weight: 500;
-    color: #666;
-    border-bottom: 3px solid transparent;
-    transition: .25s;
 }
 
 .tab.active {
     color: #0b5ed7;
     border-bottom: 3px solid #0b5ed7;
-    font-weight: 600;
 }
 
-.tab:hover {
-    background: #f2f6ff;
-}
-
-/* ===== Ô TÌM KIẾM ===== */
-
+/* ô tìm */
 input {
-    width: 100%;
-    padding: 12px 14px;
+    margin: 12px 0 10px;
+    padding: 12px;
     font-size: 15px;
     border-radius: 8px;
     border: 1px solid #ccc;
-    outline: none;
-    margin-bottom: 8px;
 }
 
-input:focus {
-    border-color: #0b5ed7;
-    box-shadow: 0 0 0 2px rgba(11,94,215,.15);
-}
-
-/* ===== KẾT QUẢ ===== */
-
+/* 🔥 KHUNG KẾT QUẢ */
 #results {
-    margin-top: 10px;
+    flex: 1;                  /* 🔥 ăn phần còn lại */
+    overflow-y: auto;         /* 🔥 CUỘN */
+    overflow-x: hidden;
     border: 1px solid #ddd;
     border-radius: 10px;
-    max-height: 360px;
-    overflow-y: auto;
-    background: #fff;
+    padding: 6px;
 }
 
 /* mỗi dòng */
-
 .result-item {
-    padding: 10px 14px;
+    padding: 10px 12px;
     border-bottom: 1px solid #eee;
-    cursor: pointer;
-    transition: .15s;
     font-size: 14.5px;
     line-height: 1.45;
-}
 
-.result-item:hover {
-    background: #eef4ff;
+    word-break: break-word;
+    white-space: normal;
 }
 
 .result-item:last-child {
     border-bottom: none;
 }
 
-/* ===== scrollbar đẹp ===== */
+.result-item:hover {
+    background: #eef4ff;
+}
 
+/* scrollbar */
 #results::-webkit-scrollbar {
     width: 8px;
 }
-
 #results::-webkit-scrollbar-thumb {
     background: #c5d5f5;
     border-radius: 10px;
 }
-
-#results::-webkit-scrollbar-track {
-    background: #f4f6f9;
-}
-
-/* ===== mobile ===== */
-
-@media (max-width: 600px) {
-    .container {
-        height: 95vh;
-        padding: 18px;
-    }
-
-    #results {
-        max-height: 60vh;
-    }
-}
-
-#results {
-    max-height: 360px !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    display: block;
-}
-
-.result-item {
-    white-space: normal !important;
-    word-break: break-word !important;
-    overflow-wrap: anywhere !important;
-}
-
