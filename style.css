@@ -10,45 +10,47 @@ body {
 .container {
     width: 900px;
     margin: 40px auto;
-    background: white;
-    padding: 25px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0,0,0,.1);
+    background: #fff;
+    padding: 22px;
+    border-radius: 10px;
+    box-shadow: 0 0 12px rgba(0,0,0,.15);
 }
 
 h2 {
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
+}
+
+.tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.tab {
+    padding: 8px 16px;
+    border: none;
+    cursor: pointer;
+    background: #e3e3e3;
+    border-radius: 5px;
+}
+
+.tab.active {
+    background: #1976d2;
+    color: white;
 }
 
 input {
-    width: 70%;
+    width: 100%;
     padding: 10px;
     font-size: 16px;
+    margin-bottom: 12px;
 }
 
-button {
-    padding: 10px 18px;
-    font-size: 16px;
-    cursor: pointer;
-    background: #1e88e5;
-    color: white;
-    border: none;
-    border-radius: 4px;
-}
-
-button:hover {
-    background: #1565c0;
-}
-
-/* ===================== */
-/* KHUNG CỐ ĐỊNH CHỐNG TRÀN */
-/* ===================== */
-
+/* 👇 KHUNG CỐ ĐỊNH */
 .table-wrapper {
-    margin-top: 20px;
-    max-height: 380px;       /* 👈 GIỚI HẠN CHIỀU CAO */
-    overflow-y: auto;        /* 👈 SCROLL DỌC */
+    max-height: 420px;
+    overflow-y: auto;
     border: 1px solid #ccc;
 }
 
@@ -62,11 +64,11 @@ thead {
     background: #1976d2;
     color: white;
     position: sticky;
-    top: 0;                  /* 👈 HEADER DÍNH */
+    top: 0;
 }
 
 th, td {
-    padding: 10px;
+    padding: 9px;
     border-bottom: 1px solid #ddd;
     text-align: left;
 }
