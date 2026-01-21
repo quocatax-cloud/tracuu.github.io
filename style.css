@@ -4,16 +4,16 @@
 }
 
 body {
-    background: #f4f6f8;
+    background: #f2f4f7;
 }
 
 .container {
-    width: 900px;
-    margin: 40px auto;
+    width: 950px;
+    margin: 30px auto;
     background: #fff;
     padding: 22px;
     border-radius: 10px;
-    box-shadow: 0 0 12px rgba(0,0,0,.15);
+    box-shadow: 0 0 15px rgba(0,0,0,.2);
 }
 
 h2 {
@@ -28,11 +28,11 @@ h2 {
 }
 
 .tab {
-    padding: 8px 16px;
+    padding: 8px 18px;
     border: none;
+    background: #e0e0e0;
     cursor: pointer;
-    background: #e3e3e3;
-    border-radius: 5px;
+    border-radius: 6px;
 }
 
 .tab.active {
@@ -40,24 +40,31 @@ h2 {
     color: white;
 }
 
+.top-bar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
 input {
-    width: 100%;
+    flex: 1;
     padding: 10px;
     font-size: 16px;
-    margin-bottom: 12px;
 }
 
-/* 👇 KHUNG CỐ ĐỊNH */
+#exportBtn {
+    padding: 10px 16px;
+    border: none;
+    background: #2e7d32;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
 .table-wrapper {
-    max-height: 420px;
+    max-height: 460px;
     overflow-y: auto;
     border: 1px solid #ccc;
-}
-
-/* bảng */
-table {
-    width: 100%;
-    border-collapse: collapse;
 }
 
 thead {
@@ -70,9 +77,20 @@ thead {
 th, td {
     padding: 9px;
     border-bottom: 1px solid #ddd;
-    text-align: left;
 }
 
 tbody tr:hover {
-    background: #f1f1f1;
+    background: #f3f3f3;
+    cursor: pointer;
+}
+
+mark {
+    background: #ffe066;
+    padding: 0 2px;
+}
+
+.note {
+    margin-top: 8px;
+    color: #555;
+    font-size: 14px;
 }
