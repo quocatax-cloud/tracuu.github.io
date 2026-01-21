@@ -60,6 +60,34 @@ input {
     border-bottom: 1px solid #eee;
 }
 
+/* ===== KẾT QUẢ TÌM KIẾM ===== */
+
+#results {
+    margin-top: 10px;
+    max-height: 320px;      /* không cho tràn màn hình */
+    overflow-y: auto;       /* xuất hiện thanh cuộn */
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: #fff;
+}
+
+/* mỗi dòng kết quả */
+.result-item {
+    padding: 8px 12px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.result-item:last-child {
+    border-bottom: none;
+}
+
+.result-item:hover {
+    background: #e9f2ff;
+}
+
+
 .result-item:last-child {
     border-bottom: none;
 }
