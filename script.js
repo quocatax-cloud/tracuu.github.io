@@ -5,15 +5,17 @@ const files = {
 };
 
 let currentType = "dbhc";
-let rawData = [];
+let data = [];
 
 document.querySelectorAll(".tab").forEach(tab => {
     tab.onclick = () => {
         document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
         tab.classList.add("active");
+
         currentType = tab.dataset.type;
         document.getElementById("searchInput").value = "";
         document.getElementById("result").innerHTML = "";
+
         loadData();
     };
 });
@@ -22,10 +24,10 @@ async function loadData() {
     const res = await fetch(files[currentType]);
     const text = await res.text();
 
-    rawData = text
+    data = text
         .split("\n")
-        .map(line => line.trim())
-        .filter(Boolean);
+        .map(l => l.trim())
+        .filter(l => l !== "");
 }
 
 function normalize(str) {
@@ -34,43 +36,14 @@ function normalize(str) {
         .normalize("NFD")
         .replace(/[\u0300-\u036f]/g, "")
         .replace(/đ/g, "d")
-        .replace(/[^a-z0-9 ]/g, " ");
-}
-
-function scoreLine(line, keys) {
-    const text = normalize(line);
-    let score = 0;
-
-    const fullKey = keys.join(" ");
-
-    // khớp nguyên cụm
-    if (text.includes(fullKey)) score += 100;
-
-    // từng từ
-    keys.forEach(k => {
-        if (text.includes(k)) score += 15;
-
-        // khớp nguyên từ
-        const reg = new RegExp(`\\b${k}\\b`);
-        if (reg.test(text)) score += 10;
-    });
-
-    // đúng thứ tự
-    let last = -1;
-    for (let k of keys) {
-        const pos = text.indexOf(k);
-        if (pos >= last && pos !== -1) {
-            score += 5;
-            last = pos;
-        }
-    }
-
-    return score;
+        .replace(/[^a-z0-9 ]/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
 }
 
 document.getElementById("searchInput").addEventListener("input", function () {
-    const input = normalize(this.value);
-    const keys = input.split(/\s+/).filter(Boolean);
+    const keyword = normalize(this.value);
+    const keys = keyword.split(" ").filter(Boolean);
 
     if (keys.length === 0) {
         document.getElementById("result").innerHTML = "";
@@ -79,10 +52,21 @@ document.getElementById("searchInput").addEventListener("input", function () {
 
     const results = [];
 
-    for (let line of rawData) {
-        const s = scoreLine(line, keys);
-        if (s > 0) {
-            results.push({ line, score: s });
+    for (let line of data) {
+        const text = normalize(line);
+
+        let score = 0;
+
+        // khớp toàn cụm
+        if (text.includes(keyword)) score += 100;
+
+        // khớp từng từ
+        keys.forEach(k => {
+            if (text.includes(k)) score += 20;
+        });
+
+        if (score > 0) {
+            results.push({ line, score });
         }
     }
 
@@ -94,9 +78,7 @@ document.getElementById("searchInput").addEventListener("input", function () {
         top.length === 0
             ? "<div class='result-item'>❌ Không tìm thấy kết quả</div>"
             : top.map(r =>
-                `<div class="result-item">
-                    <b>${r.score}</b> — ${r.line}
-                </div>`
+                `<div class="result-item">${r.line}</div>`
               ).join("");
 });
 
