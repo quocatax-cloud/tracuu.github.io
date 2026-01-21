@@ -3,38 +3,47 @@
 <head>
 <meta charset="UTF-8">
 <title>Tra cứu danh mục</title>
+
 <link rel="stylesheet" href="style.css">
+
+<!-- thư viện xuất excel -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
 </head>
 <body>
 
 <div class="container">
 
-    <h2>TRA CỨU DANH MỤC</h2>
+<h2>TRA CỨU DANH MỤC TXT</h2>
 
-    <div class="tabs">
-        <button class="tab active" data-file="dbhc.txt">Phường / Xã</button>
-        <button class="tab" data-file="kbnn.txt">Kho bạc</button>
-        <button class="tab" data-file="nganhang.txt">Ngân hàng</button>
-    </div>
+<div class="tabs">
+    <button class="tab active" data-file="dbhc.txt">ĐBHC</button>
+    <button class="tab" data-file="kbnn.txt">Kho bạc</button>
+    <button class="tab" data-file="nganhang.txt">Ngân hàng</button>
+</div>
 
-    <input
-        id="searchInput"
-        placeholder="Nhập tên, mã, khu vực, số..."
-        autocomplete="off"
-    >
+<div class="top-bar">
+    <input id="searchInput" placeholder="Nhập mã, tên, khu vực...">
 
-    <!-- KHUNG GIỮ CỐ ĐỊNH -->
-    <div class="table-wrapper">
-        <table>
-            <thead>
-                <tr id="table-head"></tr>
-            </thead>
-            <tbody id="results"></tbody>
-        </table>
-    </div>
+    <button id="exportBtn">⬇ Xuất Excel</button>
+</div>
+
+<div class="table-wrapper">
+<table>
+    <thead>
+        <tr id="table-head"></tr>
+    </thead>
+    <tbody id="results"></tbody>
+</table>
+</div>
+
+<div class="note">
+👉 Click dòng bất kỳ để copy mã
+</div>
 
 </div>
 
 <script src="script.js"></script>
+<script src="export.js"></script>
 </body>
 </html>
