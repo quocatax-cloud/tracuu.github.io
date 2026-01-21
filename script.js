@@ -1,7 +1,7 @@
 let rawData = [];
 let currentFile = "dbhc.txt";
 let lastResult = [];
-
+ 
 const input = document.getElementById("searchInput");
 const tbody = document.getElementById("results");
 const thead = document.getElementById("table-head");
