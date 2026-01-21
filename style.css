@@ -1,68 +1,65 @@
+* {
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
 body {
-    background: #cfd8dc;
-    font-family: Tahoma;
+    margin: 0;
+    height: 100vh;
+    background: #eef1f6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-.window {
-    width: 820px;
-    margin: 30px auto;
-    background: #f5f5f5;
-    border: 1px solid #7a7a7a;
-    box-shadow: 3px 3px 8px #888;
+.app {
+    width: 420px;
+    background: white;
+    padding: 25px;
+    border-radius: 18px;
+    box-shadow: 0 20px 50px rgba(0,0,0,.15);
 }
 
-.titlebar {
-    background: linear-gradient(#e3f2fd,#bbdefb);
-    padding: 6px 10px;
-    font-weight: bold;
-    border-bottom: 1px solid #888;
+h2 {
+    text-align: center;
+    margin-bottom: 15px;
 }
 
 .tabs {
-    padding: 6px;
-    border-bottom: 1px solid #aaa;
+    display: flex;
+    gap: 6px;
+    margin-bottom: 15px;
 }
 
 .tab {
-    padding: 5px 14px;
-    margin-right: 5px;
-    border: 1px solid #888;
-    background: #e0e0e0;
+    flex: 1;
+    border: none;
+    padding: 10px;
+    border-radius: 10px;
+    background: #e5e7eb;
+    font-weight: bold;
     cursor: pointer;
 }
 
 .tab.active {
-    background: white;
-    border-bottom: 1px solid white;
-    font-weight: bold;
+    background: #2563eb;
+    color: white;
 }
 
-.search {
-    padding: 8px;
-}
-
-.search input {
-    width: 680px;
-    height: 26px;
-    font-size: 15px;
-    padding-left: 6px;
-}
-
-table {
+input {
     width: 100%;
-    border-collapse: collapse;
-    font-size: 14px;
+    padding: 12px;
+    font-size: 16px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    margin-bottom: 15px;
 }
 
-thead {
-    background: #e6e6e6;
+.result-item {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
 }
 
-th, td {
-    border: 1px solid #999;
-    padding: 4px 6px;
-}
-
-tbody tr:hover {
-    background: #d7ebff;
+.result-item:last-child {
+    border-bottom: none;
 }
